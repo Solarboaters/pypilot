@@ -21,19 +21,22 @@ cd pypilot
 sudo python setup.py install
 
 
-cd scripts/debian
-sudo cp -r etc /
-cd ../..
+# Install service units for an existing non-root account (from this checkout):
+sudo ./scripts/update_systemd_openplotter.sh "$(id -un)"
 
-# ensure user has sudo access without pw
-# (needed to run lcdclient, and setting realtime priority)
-# default user is pypilot
+# With no argument, the installer uses the account invoking sudo.
+# Existing unit files are preserved; User= overrides select the account for
+# pypilot, pypilot_boatimu and pypilot_hat. Restart running services afterwards.
+# Configuration belongs in that account's ~/.pypilot directory.
+# This installs only systemd units, not the other etc/ examples. Device access
+# and realtime scheduling permissions must be configured separately.
 
-# this makes pypilot access point "pypilot"
+# Enable the required services:
 sudo systemctl enable pypilot
-sudo systemctl enable pypilot_lcd
+sudo systemctl enable pypilot_hat
 sudo systemctl enable pypilot_web
 
+# Optional access point: configure hostapd and dnsmasq separately first.
 sudo systemctl enable hostapd
 sudo systemctl enable dnsmasq
 
